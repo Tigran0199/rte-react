@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Editor } from '@tiptap/react';
 import { ToolbarTool } from '../types';
 import ToolbarButton from './toolbar/ToolbarButton';
 import { getToolDefinition } from './toolbar/tools';
 
 const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48'];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface ToolbarProps {
   editor: Editor;
@@ -12,11 +13,100 @@ interface ToolbarProps {
   className?: string;
 }
 
+type PopupType = 'link' | 'table' | null;
+
 const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
+  const [popup, setPopup] = useState<PopupType>(null);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkText, setLinkText] = useState('');
+  const [tableRows, setTableRows] = useState('3');
+  const [tableCols, setTableCols] = useState('3');
+  const popupRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const hasSelection = !editor.state.selection.empty;
   const currentFontSize = editor.getAttributes('textStyle').fontSize?.replace('px', '') || '16';
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+        setPopup(null);
+      }
+    };
+    if (popup) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [popup]);
 
   const handleFontSize = (size: string) => {
     editor.chain().focus().setFontSize(`${size}px`).run();
+  };
+
+  const handleLinkOpen = () => {
+    setLinkUrl(editor.getAttributes('link').href || '');
+    setLinkText('');
+    setPopup(popup === 'link' ? null : 'link');
+  };
+
+  const handleLinkSave = () => {
+    if (!linkUrl) return;
+    if (hasSelection) {
+      editor.chain().focus().setLink({ href: linkUrl }).run();
+    } else {
+      if (!linkText) return;
+      editor
+        .chain()
+        .focus()
+        .insertContent(`<a href="${linkUrl}">${linkText}</a>`)
+        .run();
+    }
+    setLinkUrl('');
+    setLinkText('');
+    setPopup(null);
+  };
+
+  const handleLinkKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleLinkSave();
+    if (e.key === 'Escape') setPopup(null);
+  };
+
+  const handleImageClick = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      alert('Image is too large. Maximum size is 10MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      editor.chain().focus().setImage({ src: base64 }).run();
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be picked again
+    e.target.value = '';
+  };
+
+  const handleTableOpen = () => {
+    setPopup(popup === 'table' ? null : 'table');
+  };
+
+  const handleTableInsert = () => {
+    const rows = Math.min(10, Math.max(1, parseInt(tableRows) || 3));
+    const cols = Math.min(10, Math.max(1, parseInt(tableCols) || 3));
+    editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run();
+    setPopup(null);
+  };
+
+  const handleTableKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleTableInsert();
+    if (e.key === 'Escape') setPopup(null);
   };
 
   const handleTool = (tool: ToolbarTool) => {
@@ -35,19 +125,6 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
       case 'orderedList': editor.chain().focus().toggleOrderedList().run(); break;
       case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;
       case 'codeBlock': editor.chain().focus().toggleCodeBlock().run(); break;
-      case 'link': {
-        const url = window.prompt('Enter URL');
-        if (url) editor.chain().focus().setLink({ href: url }).run();
-        break;
-      }
-      case 'image': {
-        const url = window.prompt('Enter image URL');
-        if (url) editor.chain().focus().setImage({ src: url }).run();
-        break;
-      }
-      case 'table':
-        editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-        break;
       case 'undo': editor.chain().focus().undo().run(); break;
       case 'redo': editor.chain().focus().redo().run(); break;
     }
@@ -80,12 +157,91 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
     return false;
   };
 
+  const renderPopup = (tool: ToolbarTool) => {
+    if (tool === 'link' && popup === 'link') {
+      return (
+        <div className="rre-popup" ref={popupRef}>
+          <input
+            className="rre-popup-input"
+            type="url"
+            placeholder="https://example.com"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            onKeyDown={handleLinkKeyDown}
+            autoFocus
+          />
+          {!hasSelection && (
+            <input
+              className="rre-popup-input"
+              type="text"
+              placeholder="Display text"
+              value={linkText}
+              onChange={(e) => setLinkText(e.target.value)}
+              onKeyDown={handleLinkKeyDown}
+            />
+          )}
+          <button
+            className="rre-popup-btn"
+            onMouseDown={(e) => { e.preventDefault(); handleLinkSave(); }}
+          >
+            Save
+          </button>
+        </div>
+      );
+    }
+
+    if (tool === 'table' && popup === 'table') {
+      return (
+        <div className="rre-popup rre-popup--table" ref={popupRef}>
+          <input
+            className="rre-popup-input rre-popup-input--num"
+            type="number"
+            min="1"
+            max="10"
+            value={tableRows}
+            onChange={(e) => setTableRows(e.target.value)}
+            onKeyDown={handleTableKeyDown}
+            autoFocus
+          />
+          <span className="rre-popup-x">×</span>
+          <input
+            className="rre-popup-input rre-popup-input--num"
+            type="number"
+            min="1"
+            max="10"
+            value={tableCols}
+            onChange={(e) => setTableCols(e.target.value)}
+            onKeyDown={handleTableKeyDown}
+          />
+          <button
+            className="rre-popup-btn"
+            onMouseDown={(e) => { e.preventDefault(); handleTableInsert(); }}
+          >
+            Insert
+          </button>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <div className={['rre-toolbar', className].filter(Boolean).join(' ')} role="toolbar">
+      {/* Hidden file input for image */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleImageChange}
+      />
+
       {toolbar.map((tool, i) => {
         if (tool === 'divider') {
           return <div key={`divider-${i}`} className="rre-toolbar-divider" aria-hidden="true" />;
         }
+
         if (tool === 'fontSize') {
           return (
             <select
@@ -101,6 +257,55 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
             </select>
           );
         }
+
+        if (tool === 'link') {
+          const def = getToolDefinition(tool);
+          if (!def) return null;
+          return (
+          <div  key="link" className="rre-toolbar-popup-wrapper" onMouseDown={(e) => e.stopPropagation()}> 
+              <ToolbarButton
+                onClick={handleLinkOpen}
+                isActive={editor.isActive('link') || popup === 'link'}
+                title={def.title}
+              >
+                <span className="rre-icon" dangerouslySetInnerHTML={{ __html: def.icon }} />
+              </ToolbarButton>
+              {renderPopup('link')}
+            </div>
+          );
+        }
+
+        if (tool === 'image') {
+          const def = getToolDefinition(tool);
+          if (!def) return null;
+          return (
+            <ToolbarButton
+              key="image"
+              onClick={handleImageClick}
+              title={def.title}
+            >
+              <span className="rre-icon" dangerouslySetInnerHTML={{ __html: def.icon }} />
+            </ToolbarButton>
+          );
+        }
+
+        if (tool === 'table') {
+          const def = getToolDefinition(tool);
+          if (!def) return null;
+          return (
+<div key="table" className="rre-toolbar-popup-wrapper" onMouseDown={(e) => e.stopPropagation()}>
+              <ToolbarButton
+                onClick={handleTableOpen}
+                isActive={popup === 'table'}
+                title={def.title}
+              >
+                <span className="rre-icon" dangerouslySetInnerHTML={{ __html: def.icon }} />
+              </ToolbarButton>
+              {renderPopup('table')}
+            </div>
+          );
+        }
+
         const def = getToolDefinition(tool);
         if (!def) return null;
         return (
@@ -111,10 +316,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
             disabled={isDisabled(tool)}
             title={def.title}
           >
-            <span
-              className="rre-icon"
-              dangerouslySetInnerHTML={{ __html: def.icon }}
-            />
+            <span className="rre-icon" dangerouslySetInnerHTML={{ __html: def.icon }} />
           </ToolbarButton>
         );
       })}

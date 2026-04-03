@@ -1,6 +1,6 @@
 # rte-react
 
-A lightweight, fully-typed React rich text editor with a configurable toolbar. Outputs clean HTML. Works with React 17+.
+A lightweight, fully-typed React rich text editor with a configurable toolbar. Outputs clean HTML. Works with React 17 and higher.
 
 ## Install
 

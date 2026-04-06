@@ -1,6 +1,6 @@
 {
   "name": "rte-react",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A lightweight, fully-typed React rich text editor with a configurable toolbar. Outputs HTML. Works with React 17+.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -22,15 +22,29 @@
     "test": "jest",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "react",
-    "rich-text-editor",
-    "tiptap",
-    "wysiwyg",
-    "editor",
-    "typescript"
-  ],
-  "author": "",
+"keywords": [
+  "react",
+  "rich-text-editor",
+  "rte",
+  "wysiwyg",
+  "editor",
+  "typescript",
+  "tiptap",
+  "html-editor",
+  "text-editor",
+  "react-editor",
+  "contenteditable",
+  "toolbar"
+],
+"repository": {
+  "type": "git",
+  "url": "https://github.com/Tigran0199/rte-react"
+},
+"homepage": "https://github.com/Tigran0199/rte-react#readme",
+"bugs": {
+  "url": "https://github.com/Tigran0199/rte-react/issues"
+},
+"author": "Tigran0199",
   "license": "MIT",
   "peerDependencies": {
     "react": ">=17",

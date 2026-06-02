@@ -15,17 +15,26 @@ interface ToolbarProps {
 
 type PopupType = 'link' | 'table' | null;
 
+const SAFE_URL_PATTERN = /^(https?:\/\/|mailto:|tel:|\/|#)/i;
+
+const sanitizeUrl = (url: string): string => {
+  const trimmed = url.trim();
+  return SAFE_URL_PATTERN.test(trimmed) ? trimmed : `https://${trimmed}`;
+};
+
 const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
   const [popup, setPopup] = useState<PopupType>(null);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkText, setLinkText] = useState('');
+  // Captured once when the popup opens so autoFocus on the URL input doesn't
+  // change it after the editor loses focus.
+  const [linkHasSelection, setLinkHasSelection] = useState(false);
   const [tableRows, setTableRows] = useState('3');
   const [tableCols, setTableCols] = useState('3');
   const popupRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const hasSelection = !editor.state.selection.empty;
-  const currentFontSize = editor.getAttributes('textStyle').fontSize?.replace('px', '') || '16';
+  const currentFontSize = editor.getAttributes('textStyle').fontSize?.replace(/px$/, '') || '16';
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -43,21 +52,29 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
   };
 
   const handleLinkOpen = () => {
+    if (popup === 'link') {
+      setPopup(null);
+      return;
+    }
+    // Capture selection state now — before autoFocus on the URL input causes the
+    // editor to lose focus and the selection to clear.
+    setLinkHasSelection(!editor.state.selection.empty);
     setLinkUrl(editor.getAttributes('link').href || '');
     setLinkText('');
-    setPopup(popup === 'link' ? null : 'link');
+    setPopup('link');
   };
 
   const handleLinkSave = () => {
     if (!linkUrl) return;
-    if (hasSelection) {
-      editor.chain().focus().setLink({ href: linkUrl }).run();
+    const safeUrl = sanitizeUrl(linkUrl);
+    if (linkHasSelection) {
+      editor.chain().focus().setLink({ href: safeUrl }).run();
     } else {
       if (!linkText) return;
       editor
         .chain()
         .focus()
-        .insertContent(`<a href="${linkUrl}">${linkText}</a>`)
+        .insertContent({ type: 'text', text: linkText, marks: [{ type: 'link', attrs: { href: safeUrl } }] })
         .run();
     }
     setLinkUrl('');
@@ -170,7 +187,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
             onKeyDown={handleLinkKeyDown}
             autoFocus
           />
-          {!hasSelection && (
+          {!linkHasSelection && (
             <input
               className="rre-popup-input"
               type="text"

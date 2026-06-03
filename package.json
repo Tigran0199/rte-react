@@ -1,6 +1,6 @@
 {
   "name": "rte-react",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A lightweight, fully-typed React rich text editor with a configurable toolbar. Outputs HTML. Works with React 17+.",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

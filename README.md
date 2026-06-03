@@ -89,7 +89,7 @@ Add `'fontFamily'` to the `toolbar` prop to show the font family picker. It rend
 
 Selecting text and choosing a font wraps it in a `<span style="font-family: ...">`. Choosing **Default** removes the inline style cleanly. The dropdown always reflects the font at the current cursor position.
 
-### Available fonts
+### Default fonts
 
 | Label | CSS value |
 |-------|-----------|
@@ -101,6 +101,46 @@ Selecting text and choosing a font wraps it in a `<span style="font-family: ..."
 | Trebuchet MS | `'Trebuchet MS', sans-serif` |
 | Verdana | `Verdana, sans-serif` |
 | Courier New | `'Courier New', Courier, monospace` |
+
+### Custom font list
+
+Pass a `fontFamilies` prop to replace the default list with your own fonts. Each entry is a `{ label, value }` object where `value` is any valid CSS `font-family` string.
+
+```tsx
+import { RichEditor, DEFAULT_FONT_FAMILIES } from 'rte-react';
+import type { FontFamilyOption } from 'rte-react';
+
+// Completely custom list
+const myFonts: FontFamilyOption[] = [
+  { label: 'Default',    value: '' },
+  { label: 'Inter',      value: 'Inter, sans-serif' },
+  { label: 'Roboto',     value: 'Roboto, sans-serif' },
+  { label: 'Fira Code',  value: "'Fira Code', monospace" },
+];
+
+<RichEditor
+  toolbar={['fontFamily', 'divider', 'bold', 'italic']}
+  fontFamilies={myFonts}
+  value={content}
+  onChange={setContent}
+/>
+```
+
+To extend the built-in list rather than replace it, spread `DEFAULT_FONT_FAMILIES`:
+
+```tsx
+import { DEFAULT_FONT_FAMILIES } from 'rte-react';
+
+const extendedFonts = [
+  ...DEFAULT_FONT_FAMILIES,
+  { label: 'Inter',     value: 'Inter, sans-serif' },
+  { label: 'Fira Code', value: "'Fira Code', monospace" },
+];
+
+<RichEditor fontFamilies={extendedFonts} ... />
+```
+
+> **Note:** the editor only renders the font — it does not load any font files. Make sure any custom web fonts (e.g. from Google Fonts) are loaded in your app before using them here.
 
 `fontFamily` and `fontSize` are independent marks and can be combined freely — selecting both tools applies both `font-family` and `font-size` on the same span.
 
@@ -146,6 +186,7 @@ Pass a `toolbar` prop to control which tools are shown and in what order:
 | `onChange` | `(value: string \| JSONContent[]) => void` | — | Called on every content change. Receives a value in the format set by `outputFormat`. |
 | `outputFormat` | `'html' \| 'md' \| 'json'` | `'html'` | Format used for both `value` input and `onChange` output. |
 | `toolbar` | `ToolbarTool[]` | All tools | Tools to show in the toolbar. |
+| `fontFamilies` | `FontFamilyOption[]` | Built-in list | Custom font list for the `fontFamily` picker. Replaces the default 8 fonts entirely. |
 | `placeholder` | `string` | `'Start typing...'` | Placeholder text shown when the editor is empty. |
 | `editable` | `boolean` | `true` | Set to `false` to render a read-only view (toolbar is hidden). |
 | `className` | `string` | — | Class added to the outer wrapper element. |
@@ -156,15 +197,18 @@ Pass a `toolbar` prop to control which tools are shown and in what order:
 ## Exported Types
 
 ```ts
-import type { RichEditorProps, ToolbarTool, OutputFormat, JSONContent } from 'rte-react';
+import { DEFAULT_FONT_FAMILIES } from 'rte-react';
+import type { RichEditorProps, ToolbarTool, OutputFormat, JSONContent, FontFamilyOption } from 'rte-react';
 ```
 
-| Type | Description |
-|------|-------------|
-| `RichEditorProps` | Full props interface for `<RichEditor>` |
-| `ToolbarTool` | Union of all valid toolbar tool names |
-| `OutputFormat` | `'html' \| 'md' \| 'json'` |
-| `JSONContent` | ProseMirror node shape used for JSON format (re-exported from `@tiptap/core`) |
+| Export | Kind | Description |
+|--------|------|-------------|
+| `RichEditorProps` | type | Full props interface for `<RichEditor>` |
+| `ToolbarTool` | type | Union of all valid toolbar tool names |
+| `OutputFormat` | type | `'html' \| 'md' \| 'json'` |
+| `JSONContent` | type | ProseMirror node shape used for JSON format (re-exported from `@tiptap/core`) |
+| `FontFamilyOption` | type | `{ label: string; value: string }` — shape of a font picker entry |
+| `DEFAULT_FONT_FAMILIES` | value | The built-in font list used when no `fontFamilies` prop is passed |
 
 ## License
 

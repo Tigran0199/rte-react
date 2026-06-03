@@ -5,6 +5,17 @@ import ToolbarButton from './toolbar/ToolbarButton';
 import { getToolDefinition } from './toolbar/tools';
 
 const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36', '48'];
+
+const FONT_FAMILIES: { label: string; value: string }[] = [
+  { label: 'Default',        value: '' },
+  { label: 'Arial',          value: 'Arial, sans-serif' },
+  { label: 'Georgia',        value: 'Georgia, serif' },
+  { label: 'Helvetica',      value: 'Helvetica, Arial, sans-serif' },
+  { label: 'Times New Roman', value: "'Times New Roman', Times, serif" },
+  { label: 'Trebuchet MS',   value: "'Trebuchet MS', sans-serif" },
+  { label: 'Verdana',        value: 'Verdana, sans-serif' },
+  { label: 'Courier New',    value: "'Courier New', Courier, monospace" },
+];
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 
 interface ToolbarProps {
@@ -35,6 +46,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const currentFontSize = editor.getAttributes('textStyle').fontSize?.replace(/px$/, '') || '16';
+  const currentFontFamily = editor.getAttributes('textStyle').fontFamily || '';
 
   // Close popup when clicking outside
   useEffect(() => {
@@ -49,6 +61,14 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
 
   const handleFontSize = (size: string) => {
     editor.chain().focus().setFontSize(`${size}px`).run();
+  };
+
+  const handleFontFamily = (family: string) => {
+    if (!family) {
+      editor.chain().focus().unsetFontFamily().run();
+    } else {
+      editor.chain().focus().setFontFamily(family).run();
+    }
   };
 
   const handleLinkOpen = () => {
@@ -270,6 +290,28 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, className }) => {
             >
               {FONT_SIZES.map((size) => (
                 <option key={size} value={size}>{size}px</option>
+              ))}
+            </select>
+          );
+        }
+
+        if (tool === 'fontFamily') {
+          return (
+            <select
+              key="fontFamily"
+              className="rre-fontfamily-select"
+              value={currentFontFamily}
+              onChange={(e) => handleFontFamily(e.target.value)}
+              title="Font family"
+            >
+              {FONT_FAMILIES.map((font) => (
+                <option
+                  key={font.value}
+                  value={font.value}
+                  style={{ fontFamily: font.value || 'inherit' }}
+                >
+                  {font.label}
+                </option>
               ))}
             </select>
           );

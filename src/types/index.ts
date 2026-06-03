@@ -25,6 +25,7 @@ export type ToolbarTool =
   | 'undo'
   | 'redo'
   | 'fontSize'
+  | 'fontFamily'
   | 'divider';
 
 export interface RichEditorProps {

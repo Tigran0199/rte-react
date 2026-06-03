@@ -104,6 +104,7 @@ Pass a `toolbar` prop to control which tools are shown and in what order:
 | `image` | Upload and insert an image (max 10 MB) |
 | `table` | Insert a table (configurable rows × cols) |
 | `fontSize` | Font size dropdown (12–48 px) |
+| `fontFamily` | Font family picker (Arial, Georgia, Helvetica, Times New Roman, Trebuchet MS, Verdana, Courier New) |
 | `undo` | Undo |
 | `redo` | Redo |
 | `divider` | Visual separator in the toolbar |

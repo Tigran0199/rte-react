@@ -15,7 +15,9 @@ function App() {
         <h2>Full Toolbar</h2>
         <RichEditor
           value={html}
-          onChange={setHtml}
+          onChange={(val)=>{
+            setHtml(val as string)
+          }}
           placeholder="Start typing..."
           toolbar={['fontSize', 'divider', 'bold', 'italic', 'underline', 'strikethrough', 'divider', 'heading1', 'heading2', 'heading3', 'divider', 'bulletList', 'orderedList', 'blockquote', 'codeBlock', 'divider', 'link', 'image', 'table', 'divider', 'undo', 'redo']}
         />

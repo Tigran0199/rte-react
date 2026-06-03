@@ -16,6 +16,7 @@ const DEFAULT_TOOLBAR: ToolbarTool[] = [
 const RichEditor: React.FC<RichEditorProps> = ({
   value = '',
   onChange,
+  outputFormat = 'html',
   toolbar = DEFAULT_TOOLBAR,
   placeholder = 'Start typing...',
   editable = true,
@@ -24,7 +25,7 @@ const RichEditor: React.FC<RichEditorProps> = ({
   toolbarClassName,
   contentClassName,
 }) => {
-  const editor = useEditor({ value, onChange, placeholder, editable, toolbar });
+  const editor = useEditor({ value, onChange, outputFormat, placeholder, editable, toolbar });
 
   if (!editor) return null;
 

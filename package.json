@@ -22,29 +22,29 @@
     "test": "jest",
     "prepublishOnly": "npm run build"
   },
-"keywords": [
-  "react",
-  "rich-text-editor",
-  "rte",
-  "wysiwyg",
-  "editor",
-  "typescript",
-  "tiptap",
-  "html-editor",
-  "text-editor",
-  "react-editor",
-  "contenteditable",
-  "toolbar"
-],
-"repository": {
-  "type": "git",
-  "url": "https://github.com/Tigran0199/rte-react"
-},
-"homepage": "https://github.com/Tigran0199/rte-react#readme",
-"bugs": {
-  "url": "https://github.com/Tigran0199/rte-react/issues"
-},
-"author": "Tigran0199",
+  "keywords": [
+    "react",
+    "rich-text-editor",
+    "rte",
+    "wysiwyg",
+    "editor",
+    "typescript",
+    "tiptap",
+    "html-editor",
+    "text-editor",
+    "react-editor",
+    "contenteditable",
+    "toolbar"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tigran0199/rte-react"
+  },
+  "homepage": "https://github.com/Tigran0199/rte-react#readme",
+  "bugs": {
+    "url": "https://github.com/Tigran0199/rte-react/issues"
+  },
+  "author": "Tigran0199",
   "license": "MIT",
   "peerDependencies": {
     "react": ">=17",
@@ -62,7 +62,10 @@
     "@tiptap/extension-text-style": "^2.4.0",
     "@tiptap/extension-underline": "^2.4.0",
     "@tiptap/react": "^2.4.0",
-    "@tiptap/starter-kit": "^2.4.0"
+    "@tiptap/starter-kit": "^2.4.0",
+    "@types/turndown": "^5.0.6",
+    "marked": "^18.0.4",
+    "turndown": "^7.2.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.0.0",

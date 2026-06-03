@@ -1,3 +1,9 @@
+import type { JSONContent } from '@tiptap/core';
+
+export type OutputFormat = 'html' | 'md' | 'json';
+
+export type { JSONContent };
+
 export type ToolbarTool =
   | 'bold'
   | 'italic'
@@ -22,8 +28,9 @@ export type ToolbarTool =
   | 'divider';
 
 export interface RichEditorProps {
-  value?: string;
-  onChange?: (html: string) => void;
+  value?: string | JSONContent[];
+  onChange?: (value: string | JSONContent[]) => void;
+  outputFormat?: OutputFormat;
   toolbar?: ToolbarTool[];
   placeholder?: string;
   editable?: boolean;

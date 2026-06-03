@@ -4,6 +4,11 @@ export type OutputFormat = 'html' | 'md' | 'json';
 
 export type { JSONContent };
 
+export interface FontFamilyOption {
+  label: string;
+  value: string;
+}
+
 export type ToolbarTool =
   | 'bold'
   | 'italic'
@@ -25,6 +30,7 @@ export type ToolbarTool =
   | 'undo'
   | 'redo'
   | 'fontSize'
+  | 'fontFamily'
   | 'divider';
 
 export interface RichEditorProps {
@@ -32,6 +38,7 @@ export interface RichEditorProps {
   onChange?: (value: string | JSONContent[]) => void;
   outputFormat?: OutputFormat;
   toolbar?: ToolbarTool[];
+  fontFamilies?: FontFamilyOption[];
   placeholder?: string;
   editable?: boolean;
   className?: string;

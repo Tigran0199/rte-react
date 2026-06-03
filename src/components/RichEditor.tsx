@@ -1,6 +1,6 @@
 import React from 'react';
 import { EditorContent } from '@tiptap/react';
-import { RichEditorProps, ToolbarTool } from '../types';
+import { RichEditorProps, ToolbarTool, FontFamilyOption } from '../types';
 import { useEditor } from '../hooks/useEditor';
 import Toolbar from './Toolbar';
 import '../styles/editor.css';
@@ -18,6 +18,7 @@ const RichEditor: React.FC<RichEditorProps> = ({
   onChange,
   outputFormat = 'html',
   toolbar = DEFAULT_TOOLBAR,
+  fontFamilies,
   placeholder = 'Start typing...',
   editable = true,
   className,
@@ -35,7 +36,7 @@ const RichEditor: React.FC<RichEditorProps> = ({
       style={style}
     >
       {editable && (
-        <Toolbar editor={editor} toolbar={toolbar} className={toolbarClassName} />
+        <Toolbar editor={editor} toolbar={toolbar} fontFamilies={fontFamilies} className={toolbarClassName} />
       )}
       <EditorContent
         editor={editor}

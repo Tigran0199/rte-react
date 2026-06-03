@@ -14,6 +14,7 @@ import type { JSONContent } from '@tiptap/core';
 import { marked } from 'marked';
 import TurndownService from 'turndown';
 import FontSize from '../extensions/FontSize';
+import FontFamily from '../extensions/FontFamily';
 import type { ToolbarTool, OutputFormat } from '../types';
 
 interface UseEditorOptions {
@@ -77,6 +78,7 @@ export const useEditor = ({
       Underline,
       TextStyle,
       FontSize,
+      FontFamily,
       Link.configure({ openOnClick: false }),
       Image,
       Table.configure({ resizable: true }),

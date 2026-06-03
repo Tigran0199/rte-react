@@ -75,6 +75,35 @@ const [nodes, setNodes] = useState<JSONContent[]>([]);
 
 `onChange` receives a `JSONContent[]` array — the raw ProseMirror content nodes from Tiptap's `editor.getJSON().content`.
 
+## Font Picker
+
+Add `'fontFamily'` to the `toolbar` prop to show the font family picker. It renders as a dropdown where each option is displayed in its own font for a live preview.
+
+```tsx
+<RichEditor
+  value={content}
+  onChange={setContent}
+  toolbar={['fontFamily', 'fontSize', 'divider', 'bold', 'italic', 'underline']}
+/>
+```
+
+Selecting text and choosing a font wraps it in a `<span style="font-family: ...">`. Choosing **Default** removes the inline style cleanly. The dropdown always reflects the font at the current cursor position.
+
+### Available fonts
+
+| Label | CSS value |
+|-------|-----------|
+| Default | *(removes font mark)* |
+| Arial | `Arial, sans-serif` |
+| Georgia | `Georgia, serif` |
+| Helvetica | `Helvetica, Arial, sans-serif` |
+| Times New Roman | `'Times New Roman', Times, serif` |
+| Trebuchet MS | `'Trebuchet MS', sans-serif` |
+| Verdana | `Verdana, sans-serif` |
+| Courier New | `'Courier New', Courier, monospace` |
+
+`fontFamily` and `fontSize` are independent marks and can be combined freely — selecting both tools applies both `font-family` and `font-size` on the same span.
+
 ## Custom Toolbar
 
 Pass a `toolbar` prop to control which tools are shown and in what order:

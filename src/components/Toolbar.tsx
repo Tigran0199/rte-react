@@ -139,18 +139,23 @@ const Toolbar: React.FC<ToolbarProps> = ({ editor, toolbar, fontFamilies, classN
     if (e.key === 'Escape') setPopup(null);
   };
 
+  const toggleHeadingAtCursor = (level: 1 | 2 | 3 | 4 | 5 | 6) => {
+    const { anchor } = editor.state.selection;
+    editor.chain().focus().setTextSelection(anchor).toggleHeading({ level }).run();
+  };
+
   const handleTool = (tool: ToolbarTool) => {
     switch (tool) {
       case 'bold': editor.chain().focus().toggleBold().run(); break;
       case 'italic': editor.chain().focus().toggleItalic().run(); break;
       case 'underline': editor.chain().focus().toggleUnderline().run(); break;
       case 'strikethrough': editor.chain().focus().toggleStrike().run(); break;
-      case 'heading1': editor.chain().focus().toggleHeading({ level: 1 }).run(); break;
-      case 'heading2': editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
-      case 'heading3': editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
-      case 'heading4': editor.chain().focus().toggleHeading({ level: 4 }).run(); break;
-      case 'heading5': editor.chain().focus().toggleHeading({ level: 5 }).run(); break;
-      case 'heading6': editor.chain().focus().toggleHeading({ level: 6 }).run(); break;
+      case 'heading1': toggleHeadingAtCursor(1); break;
+      case 'heading2': toggleHeadingAtCursor(2); break;
+      case 'heading3': toggleHeadingAtCursor(3); break;
+      case 'heading4': toggleHeadingAtCursor(4); break;
+      case 'heading5': toggleHeadingAtCursor(5); break;
+      case 'heading6': toggleHeadingAtCursor(6); break;
       case 'bulletList': editor.chain().focus().toggleBulletList().run(); break;
       case 'orderedList': editor.chain().focus().toggleOrderedList().run(); break;
       case 'blockquote': editor.chain().focus().toggleBlockquote().run(); break;

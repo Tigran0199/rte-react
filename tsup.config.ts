@@ -11,4 +11,7 @@ export default defineConfig({
   loader: {
     '.css': 'copy',
   },
+  esbuildOptions(options) {
+    options.assetNames = 'styles/editor';
+  },
 });
